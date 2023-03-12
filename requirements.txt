@@ -1,0 +1,9 @@
+requests==2.28.1
+PyJWT==2.3.0
+# Frontend
+streamlit==1.12.2
+# Backend
+Flask==2.0.1
+waitress==2.0.0
+# CLI
+fire==0.4.0
