@@ -1,0 +1,6 @@
+include bin/alfred
+include requirements.txt
+include requirements-develop.txt
+include src/alfred/VERSION
+include README.md
+include LICENSE
