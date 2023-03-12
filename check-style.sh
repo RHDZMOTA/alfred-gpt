@@ -1,0 +1,1 @@
+pycodestyle src/alfred --max-line-length 120
