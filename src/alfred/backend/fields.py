@@ -5,7 +5,7 @@ from alfred.backend.interface import TextEnum, TextEnumField
 class LangField(TextEnumField):
 
     class Enum(TextEnum):
-        ALL = enum.auto()
+        ALL = "multilingual"
         EN = "english"
         ES = "spanish"
 
