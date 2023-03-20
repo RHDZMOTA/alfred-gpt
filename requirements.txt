@@ -5,5 +5,6 @@ streamlit==1.12.2
 # Backend
 Flask==2.0.1
 waitress==2.0.0
+peewee==3.15.3
 # CLI
 fire==0.4.0
