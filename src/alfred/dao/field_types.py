@@ -5,20 +5,21 @@ import peewee
 from alfred.utils.enum_types import TextEnum
 from alfred.utils.string_ops import camel_to_snake
 
-T = TypeVar("T", bound=TextEnum)
+A = TypeVar("A", bound=TextEnum)
+B = TypeVar("B", bound=TextEnum)
 
 
-class TextEnumField(Generic[T]):
-    _enum: Optional[Type[T]] = None
+class TextEnumField(Generic[A]):
+    _enum: Optional[Type[A]] = None
 
     @classmethod
-    def get_catalog(cls) -> Type[T]:
+    def get_catalog(cls) -> Type[A]:
         if not cls._enum:
             raise NotImplementedError
         return cls._enum
 
-    class CustomDatabaseTextEnumField(peewee.Field):
-        catalog: Type[T]
+    class CustomDatabaseTextEnumField(Generic[B], peewee.Field):
+        catalog: Type[B]
         field_type = "text"
         refs: Optional[str] = None
 
@@ -38,12 +39,12 @@ class TextEnumField(Generic[T]):
             }
             super().__init__(**kwargs)
 
-        def db_value(self, value: Optional[T]) -> Optional[str]:
+        def db_value(self, value: Optional[B]) -> Optional[str]:
             if not value:
                 return None
             return self.adapt(value.name)
 
-        def python_value(self, value: str) -> T:
+        def python_value(self, value: str) -> B:
             # Ignoring type since: Value of type "Optional[Type[TextEnum]]" is not indexable
             # At this point, we can guarantee that we have a Type[TextEnum]
             return self.catalog[value]  # type: ignore
@@ -53,4 +54,4 @@ class TextEnumField(Generic[T]):
         database_field_class = cls.CustomDatabaseTextEnumField
         database_field_class.catalog = cls.get_catalog()
         database_field_class.refs = camel_to_snake(cls.__name__)
-        return database_field_class(**kwargs)
+        return database_field_class[A](**kwargs)
