@@ -1,11 +1,14 @@
 import datetime as dt
 from time import perf_counter
-from typing import Optional
 from types import TracebackType
 from dataclasses import dataclass, field
+from typing import (
+    Optional,
+)
 
-from .settings import get_logger
-from .models import Status
+from alfred.models import ModelRegistry
+from alfred.models.enums import Status
+from alfred.settings import get_logger
 
 
 logger = get_logger(name=__name__)
@@ -33,13 +36,24 @@ class CLI:
     def hello(self, world: Optional[str] = None) -> str:
         return f"Hello, {world or 'world'}!"
 
+    def find_models(self, sep: Optional[str] = None) -> str:
+        sep = f"\n{sep or '-'} "
+        return sep + sep.join(
+            model.__name__
+            for model in ModelRegistry.find_all()
+        )
+
     def setup(self, reset: bool = False):
         # Create backend tables
         logger.info("Working on setting up the backend database...")
-        from alfred.backend.database import db
-        from alfred.backend.models import table_registry
+        from alfred.dao.database import db
 
+        table_registry = ModelRegistry.find_all()
+        logger.info("Models found: %d", len(table_registry))
+        logger.debug(
+            "Models: %s",
+            " ".join(cls.__name__ for cls in table_registry)
+        )
         with db:
-            if reset:
-                db.drop_tables(models=table_registry)
+            not reset or db.drop_tables(models=table_registry)
             db.create_tables(models=table_registry)

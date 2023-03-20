@@ -1,37 +1,26 @@
-import enum
-from typing import Any, Type, Optional
+from typing import Generic, Type, TypeVar, Optional
 
 import peewee
 
-from alfred.utils import camel_to_snake
+from alfred.utils.enum_types import TextEnum
+from alfred.utils.string_ops import camel_to_snake
+
+A = TypeVar("A", bound=TextEnum)
+B = TypeVar("B", bound=TextEnum)
 
 
-# Inspired on:
-# - https://github.com/python/cpython/blob/4d1f033986675b883b9ff14588ae6ff78fdde313/Lib/enum.py#L1265
-# - https://docs.python.org/3.11/library/enum.html#enum.StrEnum
-class TextEnum(str, enum.Enum):
-
-    def __new__(cls, value: str):
-        member = str.__new__(cls, value)
-        member._value_ = value
-        return member
-
-    @staticmethod
-    def _generate_next_value_(name: str, start: int, count: int, last_values: list[Any]) -> Any:
-        return name.lower()
-
-
-class TextEnumField:
+class TextEnumField(Generic[A]):
+    _enum: Optional[Type[A]] = None
 
     @classmethod
-    def get_catalog(cls) -> Type[TextEnum]:
-        return getattr(cls, "Enum") or (
-            lambda: (_ for _ in ()).throw(NotImplementedError)
-        )()
+    def get_catalog(cls) -> Type[A]:
+        if not cls._enum:
+            raise NotImplementedError
+        return cls._enum
 
-    class CustomDatabaseTextEnumField(peewee.Field):
+    class CustomDatabaseTextEnumField(Generic[B], peewee.Field):
+        catalog: Type[B]
         field_type = "text"
-        catalog: Optional[Type[TextEnum]] = None
         refs: Optional[str] = None
 
         def __init__(self, **kwargs):
@@ -50,12 +39,12 @@ class TextEnumField:
             }
             super().__init__(**kwargs)
 
-        def db_value(self, value: Optional[Type[TextEnum]]) -> Optional[str]:
+        def db_value(self, value: Optional[B]) -> Optional[str]:
             if not value:
                 return None
-            return super().adapt(value.name)
+            return self.adapt(value.name)
 
-        def python_value(self, value: str) -> TextEnum:
+        def python_value(self, value: str) -> B:
             # Ignoring type since: Value of type "Optional[Type[TextEnum]]" is not indexable
             # At this point, we can guarantee that we have a Type[TextEnum]
             return self.catalog[value]  # type: ignore
@@ -65,4 +54,4 @@ class TextEnumField:
         database_field_class = cls.CustomDatabaseTextEnumField
         database_field_class.catalog = cls.get_catalog()
         database_field_class.refs = camel_to_snake(cls.__name__)
-        return database_field_class(**kwargs)
+        return database_field_class[A](**kwargs)
