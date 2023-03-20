@@ -23,11 +23,11 @@ setup(
     package_dir={
         "": "src"
     },
-    #package_data={
-    #    "": [
-    #        "",
-    #    ]
-    #},
+    package_data={
+        "": [
+            os.path.join("resources", "assistant_description.txt"),
+        ]
+    },
     scripts=[
         "bin/alfred"
     ],
