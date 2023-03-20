@@ -33,11 +33,13 @@ class CLI:
     def hello(self, world: Optional[str] = None) -> str:
         return f"Hello, {world or 'world'}!"
 
-    def setup(self):
+    def setup(self, reset: bool = False):
         # Create backend tables
         logger.info("Working on setting up the backend database...")
         from alfred.backend.database import db
         from alfred.backend.models import table_registry
 
         with db:
+            if reset:
+                db.drop_tables(models=table_registry)
             db.create_tables(models=table_registry)
