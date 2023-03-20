@@ -1,6 +1,7 @@
 import enum
 from typing import Any
 
+
 # Inspired on:
 # - https://github.com/python/cpython/blob/4d1f033986675b883b9ff14588ae6ff78fdde313/Lib/enum.py#L1265
 # - https://docs.python.org/3.11/library/enum.html#enum.StrEnum

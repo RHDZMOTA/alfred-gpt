@@ -4,6 +4,7 @@ from alfred.models.user import User
 from alfred.models.assistant import Assistant
 from alfred.dao.interface import BaseModel
 
+
 class Prompt(BaseModel):
     user = peewee.ForeignKeyField(
         User,

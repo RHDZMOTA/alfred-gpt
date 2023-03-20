@@ -7,6 +7,7 @@ from alfred.utils.string_ops import camel_to_snake
 
 T = TypeVar("T", bound=TextEnum)
 
+
 class TextEnumField(Generic[T]):
     _enum: Optional[Type[T]] = None
 
