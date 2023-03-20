@@ -16,7 +16,7 @@ logger = get_logger(name=__name__)
 
 
 try:
-    db = None
+    db: peewee.Database
     raise NotImplementedError
 except NotImplementedError:
     logger.error("Database not implemented; using sqlite instead.")

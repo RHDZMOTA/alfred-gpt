@@ -16,6 +16,7 @@ class TextEnum(str, enum.Enum):
         member._value_ = value
         return member
 
+    @staticmethod
     def _generate_next_value_(name: str, start: int, count: int, last_values: list[Any]) -> Any:
         return name.lower()
 
@@ -30,8 +31,8 @@ class TextEnumField:
 
     class CustomDatabaseTextEnumField(peewee.Field):
         field_type = "text"
-        catalog: Type[TextEnum] = None
-        refs: str = None
+        catalog: Optional[Type[TextEnum]] = None
+        refs: Optional[str] = None
 
         def __init__(self, **kwargs):
             # The catalog should be implemented before creating an instance
@@ -51,11 +52,13 @@ class TextEnumField:
 
         def db_value(self, value: Optional[Type[TextEnum]]) -> Optional[str]:
             if not value:
-                return
+                return None
             return super().adapt(value.name)
 
         def python_value(self, value: str) -> TextEnum:
-            return self.catalog[value]
+            # Ignoring type since: Value of type "Optional[Type[TextEnum]]" is not indexable
+            # At this point, we can guarantee that we have a Type[TextEnum]
+            return self.catalog[value]  # type: ignore
 
     def __new__(cls, **kwargs):
         # Redirect to the inner class and define the catalog & ref attrs
