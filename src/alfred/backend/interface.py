@@ -18,3 +18,47 @@ class TextEnum(str, enum.Enum):
     def _generate_next_value_(name: str, start: int, count: int, last_values: list[Any]) -> Any:
         return name.lower()
 
+
+class TextEnumField:
+
+    @classmethod
+    def get_catalog(cls) -> Type[TextEnum]:
+        return getattr(cls, "Enum") or (
+            lambda: (_ for _ in ()).throw(NotImplementedError)
+        )()
+
+    class CustomDatabaseTextEnumField(peewee.Field):
+        field_type = "text"
+        catalog: Type[TextEnum] = None
+        refs: str = None
+
+        def __init__(self, **kwargs):
+            # The catalog should be implemented before creating an instance
+            if self.catalog is None:
+                raise NotImplementedError
+            # Define default kwargs: choices, help_text
+            # These values can be overwritten if the arguments are provided
+            kwargs = {
+                "choices": [
+                    (enum, enum.value)
+                    for enum in self.catalog
+                ],
+                "help_text": f"This is an enum text field: {self.refs}",
+                **kwargs
+            }
+            super().__init__(**kwargs)
+
+        def db_value(self, value: Optional[Type[TextEnum]]) -> Optional[str]:
+            if not value:
+                return
+            return super().adapt(value.name)
+
+        def python_value(self, value: str) -> TextEnum:
+            return self.catalog[value]
+
+    def __new__(cls, **kwargs):
+        # Redirect to the inner class and define the catalog & ref attrs
+        database_field_class = cls.CustomDatabaseTextEnumField
+        database_field_class.catalog = cls.get_catalog()
+        database_field_class.refs = camel_to_snake(cls.__name__)
+        return database_field_class(**kwargs)
