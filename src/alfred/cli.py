@@ -1,8 +1,11 @@
+import textwrap
 import datetime as dt
 from time import perf_counter
 from types import TracebackType
+from tempfile import NamedTemporaryFile
 from dataclasses import dataclass, field
 from typing import (
+    Callable,
     Optional,
 )
 
@@ -36,11 +39,29 @@ class CLI:
     def hello(self, world: Optional[str] = None) -> str:
         return f"Hello, {world or 'world'}!"
 
-    def find_models(self, sep: Optional[str] = None) -> str:
+    @staticmethod
+    def _display_values(
+            *args,
+            sep: Optional[str] = None,
+            apply: Optional[Callable] = None
+    ):
+        apply = apply or (lambda arg: arg)
         sep = f"\n{sep or '-'} "
-        return sep + sep.join(
-            model.__name__
-            for model in ModelRegistry.find_all()
+        print(sep + sep.join(apply(arg) for arg in args))
+
+    def find_views(self, sep: Optional[str] = None):
+        from alfred.frontend.controller import ViewController
+
+        self._display_values(
+            *ViewController.instance().views.keys(),
+            sep=sep,
+        )
+
+    def find_models(self, sep: Optional[str] = None):
+        self._display_values(
+            *ModelRegistry.find_all(),
+            sep=sep,
+            apply=lambda model: model.__name__
         )
 
     def setup(self, reset: bool = False):
@@ -57,3 +78,27 @@ class CLI:
         with db:
             not reset or db.drop_tables(models=table_registry)
             db.create_tables(models=table_registry)
+
+    def frontend(
+            self,
+            view: Optional[str] = None,
+            output_path: Optional[str] = None,
+            port: Optional[str] = None,
+    ):
+        from alfred.frontend import runner
+
+        view = view or "about"
+        with NamedTemporaryFile(mode="r+", delete=False, dir=output_path, suffix=".py") as file:
+            file.write(
+                textwrap.dedent(
+                    f"""
+                    from alfred.frontend.controller import ViewController
+                    
+                    if __name__ == "__main__":
+                        controller = ViewController.instance()
+                        controller.run(view_name={repr(view)})
+                    """
+                )
+            )
+
+        runner(temp_file=file.name, port=port)
