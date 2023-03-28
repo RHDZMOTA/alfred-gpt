@@ -1,3 +1,6 @@
+import datetime as dt
+from typing import Dict
+
 import peewee
 
 from alfred.dao.interface import BaseModel
@@ -53,3 +56,9 @@ class User(BaseModel):
                 password_salt=pwd_salt,
                 verified=False,
             )
+
+    def session(self) -> Dict:
+        return {
+            "user": self.email,
+            "auth_timestamp": dt.datetime.utcnow().isoformat(),
+        }
