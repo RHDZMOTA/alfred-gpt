@@ -11,6 +11,7 @@ ALFRED_LOG_LEVEL = os.environ.get(
 
 # Logging
 
+
 def get_logger(name: str, level: Optional[str] = None):
     logging.basicConfig(
         level=level or ALFRED_LOG_LEVEL
@@ -50,9 +51,10 @@ ALFRED_JWT_ENCRYPTION_ALGO: str = os.environ.get(
     default="HS256"
 )
 
+
 def get_jwt_secret_key() -> str:
     return os.environ.get("JWT_SECRET_KEY") or (
-        lambda : _logger.warning("Using the default JWT Secret Key") or "default"
+        lambda: _logger.warning("Using the default JWT Secret Key") or "default"
     )()
 
 

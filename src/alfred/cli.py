@@ -93,7 +93,7 @@ class CLI:
                 textwrap.dedent(
                     f"""
                     from alfred.frontend.controller import ViewController
-                    
+
                     if __name__ == "__main__":
                         controller = ViewController.instance()
                         controller.run(view_name={repr(view)})

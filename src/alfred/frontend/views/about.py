@@ -26,12 +26,12 @@ class About(ViewInterface):
         st.markdown(
             textwrap.dedent(
                 """
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eu ultricies purus. Cras quis lacus turpis.
-                Nam sit amet aliquet mi. Duis lacinia, justo in faucibus tristique, leo dui tempus mauris,
-                eget aliquam mauris erat ac leo. Nam urna odio, scelerisque et nisi sit amet, ornare condimentum mauris.
-                Maecenas pellentesque, erat non pellentesque tincidunt, augue tortor sollicitudin libero,
-                eu vestibulum est risus in elit. Pellentesque in bibendum nisi, quis ornare diam.
-                Phasellus consectetur scelerisque libero, vel condimentum nulla consectetur sed.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eu ultricies purus.
+                Cras quis lacus turpis. Nam sit amet aliquet mi. Duis lacinia, justo in faucibus tristique,
+                leo dui tempus mauris, eget aliquam mauris erat ac leo. Nam urna odio, scelerisque et nisi sit amet,
+                ornare condimentum mauris. Maecenas pellentesque, erat non pellentesque tincidunt,
+                augue tortor sollicitudin libero, eu vestibulum est risus in elit. Pellentesque in bibendum nisi,
+                quis ornare diam. Phasellus consectetur scelerisque libero, vel condimentum nulla consectetur sed.
                 Proin vulputate nunc ut venenatis tempor. Duis pretium scelerisque eros vel euismod.
                 Quisque iaculis cursus sapien, at rutrum dolor egestas tempus.
                 Sed nec sapien id diam porttitor imperdiet et auctor lorem.

@@ -11,6 +11,7 @@ from alfred.settings import get_logger
 
 logger = get_logger(name=__name__)
 
+
 class StartSession(ViewInterface):
     order_reference = 1
 
