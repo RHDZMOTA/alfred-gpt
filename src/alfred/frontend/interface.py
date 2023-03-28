@@ -25,7 +25,13 @@ class ViewInterface:
 
     @property
     def alias(self) -> str:
-        return camel_to_snake(self.__name__)
+        name = getattr(self, "__name__")  # Why not self.__name__? Because mypy...
+        # References:
+        # - https://github.com/python/cpython/issues/88690
+        # - https://github.com/python/mypy/issues/10403
+        # - https://github.com/python/mypy/issues/12795
+        # - https://docs.python.org/3/library/stdtypes.html#definition.__name__
+        return camel_to_snake(name)
 
     @property
     def user(self) -> Optional[User]:

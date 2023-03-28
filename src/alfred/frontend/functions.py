@@ -17,7 +17,7 @@ def get_user(
 ) -> Optional[User]:
     token = st.session_state.get("token")
     if not token:
-        return
+        return None
     payload = get_session_payload(
         token=token,
         disable_expiration=disable_token_expiration
@@ -38,5 +38,5 @@ def get_user_with_warning(
                     "You must have an active session to visualize this content."
                 )
             )
-        return
+        return None
     return user

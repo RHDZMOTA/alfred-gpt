@@ -6,7 +6,7 @@ from alfred.utils.string_ops import camel_to_snake
 
 
 class ViewController:
-    views: Dict[str, Callable]
+    views: Dict[str, ViewInterface]
     _created_at: dt.datetime
     _instance = None
 
