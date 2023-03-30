@@ -1,8 +1,12 @@
 import datetime as dt
-from typing import Dict, Optional, Callable
+from typing import Dict, Optional
 
 from alfred.frontend.interface import ViewInterface
 from alfred.utils.string_ops import camel_to_snake
+from alfred.settings import get_logger
+
+
+logger = get_logger(name=__name__)
 
 
 class ViewController:
@@ -37,6 +41,18 @@ class ViewController:
             cls._instance = cls.__new__(cls)
         return cls._instance
 
+    @property
+    def active_session(self) -> bool:
+        import streamlit as st
+        from .functions import get_session_payload
+
+        token = st.session_state.get("token")
+        if not token:
+            return False
+        payload = get_session_payload(token=token, disable_expiration=False)
+        return payload is not None
+
+
     def run(self, view_name: Optional[str] = None,  **kwargs):
         import streamlit as st
 
@@ -50,15 +66,24 @@ class ViewController:
             for view_name, view_ref in self.views.items()
         }
 
+
         # Define the sidebar
+        active_session = self.active_session
+        view_opts = []
+        for view_name, view_instance in views.items():
+            if active_session and not view_instance.hidden_if_session_active:
+                view_opts.append((view_name, view_instance.order_reference))
+            elif not active_session and not view_instance.login_required:
+                view_opts.append((view_name, view_instance.order_reference))
+            else:
+                logger.error("Misconfigured view %s", view_name)
+
+
         view_selection, _ = st.sidebar.radio(
             key="views_sidebar",
             label="Alfred Options",
             options=sorted(
-                [
-                    (view_name, view_instance.order_reference)
-                    for view_name, view_instance in views.items()
-                ],
+                view_opts,
                 key=lambda view_info: view_info[-1],
                 reverse=False,
             ),
@@ -67,4 +92,7 @@ class ViewController:
 
         # Update query params to the corresponding value
         st.experimental_set_query_params(view=view_selection)
-        views[view_selection].run(**kwargs)
+        with views[view_selection] as target_view:
+            if not target_view:
+                return
+            target_view.run(**kwargs)
