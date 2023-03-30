@@ -52,7 +52,6 @@ class ViewController:
         payload = get_session_payload(token=token, disable_expiration=False)
         return payload is not None
 
-
     def run(self, view_name: Optional[str] = None,  **kwargs):
         import streamlit as st
 
@@ -66,7 +65,6 @@ class ViewController:
             for view_name, view_ref in self.views.items()
         }
 
-
         # Define the sidebar
         active_session = self.active_session
         view_opts = []
@@ -77,7 +75,6 @@ class ViewController:
                 view_opts.append((view_name, view_instance.order_reference))
             else:
                 logger.error("Misconfigured view %s", view_name)
-
 
         view_selection, _ = st.sidebar.radio(
             key="views_sidebar",

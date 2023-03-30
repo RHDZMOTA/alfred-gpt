@@ -62,7 +62,6 @@ class ViewInterface:
             "successful" if ok else "failure"
         )
 
-
     @property
     def alias(self) -> str:
         name = getattr(self, "__name__")  # Why not self.__name__? Because mypy...
