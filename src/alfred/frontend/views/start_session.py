@@ -1,5 +1,4 @@
 import time
-import datetime as dt
 
 import streamlit as st
 
@@ -13,7 +12,10 @@ logger = get_logger(name=__name__)
 
 
 class StartSession(ViewInterface):
-    order_reference = 1
+    login_required = False
+    disable_user_info = False
+    hidden_if_session_active = True
+    order_reference = 2
 
     @property
     def alias(self) -> str:
@@ -23,10 +25,10 @@ class StartSession(ViewInterface):
         with st.form("session"):
             user_email = st.text_input(label="Email")
             user_pwd = st.text_input(label="Password", type="password")
-            submitted = st.form_submit_button("Create")
+            submitted = st.form_submit_button("Start Session")
 
         if not submitted:
-            return
+            return None
 
         try:
             user = User.get(email=user_email)
@@ -40,3 +42,6 @@ class StartSession(ViewInterface):
         jwt = JsonWebToken.auto_configure(verify_exp=True)
         st.session_state["token"] = jwt.encode(payload=user.session())
         st.success(f"Welcome {user.name}!")
+        with st.spinner("Logging into our system..."):
+            time.sleep(1)
+        st.experimental_rerun()

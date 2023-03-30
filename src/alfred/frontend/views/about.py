@@ -9,6 +9,9 @@ from alfred.frontend.interface import ViewInterface
 
 
 class About(ViewInterface):
+    login_required = False
+    disable_user_info = True
+    hidden_if_session_active = False
     order_reference = 0
 
     @property
